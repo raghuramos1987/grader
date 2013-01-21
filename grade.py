@@ -7,6 +7,8 @@
 ####################################################################
 import os,sys,shutil
 import os.path as path
+import commands
+import glob
 
 import logging
 import optparse
@@ -16,6 +18,27 @@ LOGGING_LEVELS = {'critical': logging.CRITICAL,
                   'warning': logging.WARNING,
                   'info': logging.INFO,
                   'debug': logging.DEBUG}
+
+os.chdir('data')
+for f in glob.glob("*.cpp"):
+    print f.split('-')[0], f.split('-')[-1]
+    if f.endswith('Feet.cpp'):
+        strOrig = commands.getoutput('./fallFeet.exe < inp.txt')
+    if f.endswith('Dist.cpp'):
+        strOrig = commands.getoutput('./fallDist.exe < inp.txt')
+    strOrig = strOrig.replace(' ', '')
+    commands.getoutput('rm a.out')
+    strOut = commands.getoutput('g++ "%s"'%f)
+    if 'Error' in strOut:
+        print "Did not compile!!!"
+        sys.exit(-1)
+    strOut = commands.getoutput('./a.out < inp.txt')
+    strOut = strOut.replace(' ','')
+    if strOut == strOrig:
+        print "Compiled and Executed correctly!!!"
+    else:
+        print "No correct output for %s: %s"%(f, strOut)
+
 
 def main():
     parser = optparse.OptionParser()

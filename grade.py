@@ -20,24 +20,35 @@ LOGGING_LEVELS = {'critical': logging.CRITICAL,
                   'debug': logging.DEBUG}
 
 os.chdir('data')
+fp = open(sys.argv[1], 'w')
 for f in glob.glob("*.cpp"):
+    fp.write("%s;%s;"%(f.split('-')[0], f.split('-')[-1]))
     print f.split('-')[0], f.split('-')[-1]
     if f.endswith('Feet.cpp'):
         strOrig = commands.getoutput('./fallFeet.exe < inp.txt')
     if f.endswith('Dist.cpp'):
         strOrig = commands.getoutput('./fallDist.exe < inp.txt')
     strOrig = strOrig.replace(' ', '')
+    strOrig = strOrig.replace('\n','')
     commands.getoutput('rm a.out')
     strOut = commands.getoutput('g++ "%s"'%f)
     if 'Error' in strOut:
+        fp.write("No;")
         print "Did not compile!!!"
         sys.exit(-1)
+    else:
+        fp.write("Yes;")
     strOut = commands.getoutput('./a.out < inp.txt')
     strOut = strOut.replace(' ','')
+    strOut = strOut.replace('\n','')
     if strOut == strOrig:
+        fp.write("Yes")
         print "Compiled and Executed correctly!!!"
     else:
+        fp.write(strOut)
         print "No correct output for %s: %s"%(f, strOut)
+    fp.write('\n')
+fp.close()
 
 
 def main():

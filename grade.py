@@ -3,7 +3,7 @@
 # File Name :
 # Purpose :
 # Created By :  Raghuram Onti Srinivasan
-# Email         onti@cse.ohio-state.edu
+# Email         raghuramos1987@gmail.com
 ####################################################################
 import os,sys,shutil
 import os.path as path
@@ -19,28 +19,42 @@ LOGGING_LEVELS = {'critical': logging.CRITICAL,
                   'info': logging.INFO,
                   'debug': logging.DEBUG}
 
+def checkCreated(line, name):
+    return line.split(':')[-1]
+
+def getNum(strIn):
+    outL = []
+    for word in strIn.split():
+        try:
+            outL.append(str(float(word)))
+        except ValueError:
+            continue
+    return outL
+
 os.chdir('data')
 fp = open(sys.argv[1], 'w')
 for f in glob.glob("*.cpp"):
     fp.write("%s;%s;"%(f.split('-')[0], f.split('-')[-1]))
     print f.split('-')[0], f.split('-')[-1]
-    if f.endswith('Feet.cpp'):
-        strOrig = commands.getoutput('./fallFeet.exe < inp.txt')
+    if f.endswith('Moon.cpp'):
+        strOrig = commands.getoutput('./fallMoon.exe < ../inp.txt')
     if f.endswith('Dist.cpp'):
-        strOrig = commands.getoutput('./fallDist.exe < inp.txt')
-    strOrig = strOrig.replace(' ', '')
-    strOrig = strOrig.replace('\n','')
+        strOrig = commands.getoutput('./projectileDist.exe < ../inp.txt')
+    strOrig = ' '.join(getNum(strOrig))
+    #strOrig = strOrig.replace(' ', '')
+    #strOrig = strOrig.replace('\n','')
     commands.getoutput('rm a.out')
     strOut = commands.getoutput('g++ "%s"'%f)
-    if 'Error' in strOut:
-        fp.write("No;")
+    if 'error' in strOut:
+        fp.write("No;No\n")
         print "Did not compile!!!"
-        sys.exit(-1)
+        continue
     else:
         fp.write("Yes;")
-    strOut = commands.getoutput('./a.out < inp.txt')
-    strOut = strOut.replace(' ','')
-    strOut = strOut.replace('\n','')
+    strOut = commands.getoutput('./a.out < ../inp.txt')
+    strOut = ' '.join(getNum(strOut))
+    #strOut = strOut.replace(' ','')
+    #strOut = strOut.replace('\n','')
     if strOut == strOrig:
         fp.write("Yes")
         print "Compiled and Executed correctly!!!"
@@ -49,7 +63,6 @@ for f in glob.glob("*.cpp"):
         print "No correct output for %s: %s"%(f, strOut)
     fp.write('\n')
 fp.close()
-
 
 def main():
     parser = optparse.OptionParser()
